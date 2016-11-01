@@ -2,6 +2,7 @@ package module6;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import de.fhpotsdam.unfolding.UnfoldingMap;
@@ -23,8 +24,9 @@ import processing.core.PApplet;
  * Author: UC San Diego Intermediate Software Development MOOC team
  * @author Your name here
  * Date: July 17, 2015
+ * @param <T>
  * */
-public class EarthquakeCityMap extends PApplet {
+public class EarthquakeCityMap<T> extends PApplet {
 	
 	// We will use member variables, instead of local variables, to store the data
 	// that the setUp and draw methods will need to access (as well as other methods)
@@ -36,7 +38,7 @@ public class EarthquakeCityMap extends PApplet {
 	private static final long serialVersionUID = 1L;
 
 	// IF YOU ARE WORKING OFFILINE, change the value of this variable to true
-	private static final boolean offline = false;
+	private static final boolean offline = true;
 	
 	/** This is where to find the local tiles, for working without an Internet connection */
 	public static String mbTilesString = "blankLight-1-3.mbtiles";
@@ -85,7 +87,7 @@ public class EarthquakeCityMap extends PApplet {
 		//earthquakesURL = "test2.atom";
 		
 		// Uncomment this line to take the quiz
-		//earthquakesURL = "quiz2.atom";
+		earthquakesURL = "quiz2.atom";
 		
 		
 		// (2) Reading in earthquake data and geometric properties
@@ -124,6 +126,8 @@ public class EarthquakeCityMap extends PApplet {
 	    map.addMarkers(quakeMarkers);
 	    map.addMarkers(cityMarkers);
 	    
+	    sortAndPrint(900);
+	    
 	    
 	}  // End setup
 	
@@ -137,7 +141,32 @@ public class EarthquakeCityMap extends PApplet {
 	
 	
 	// TODO: Add the method:
-	//   private void sortAndPrint(int numToPrint)
+	  private void sortAndPrint(int numToPrint)
+	  {
+		  //. This method will create a new array from the list of earthquake markers 
+		  //(hint: there is a method in the List interface named toArray() which 
+		  //returns the elements in the List as an array of Objects).
+		  //EarthquakeMarker[] quakeObjects =  (EarthquakeMarker[])quakeMarkers.toArray();
+		  
+		  ArrayList<EarthquakeMarker> al=new ArrayList<EarthquakeMarker>();  
+		  for (Marker qm : quakeMarkers){
+			  al.add((EarthquakeMarker)qm);
+		  }
+		 /*
+		  *  Then it will sort the array of earthquake markers in 
+		  *  reverse order of their magnitude (highest to lowest)
+		  *   and then print out the top numToPrint earthquakes.
+		  */
+		 //Collections.sort(al, Collections.reverseOrder());
+		 Collections.sort(al);
+
+		 for(int i =0;i < numToPrint; i++){
+			 // only print if the array's size is larger than the array index
+			 if (al.size() > i){
+			 System.out.println(al.get(i).toString());
+			 }
+		 }
+	  }
 	// and then call that method from setUp
 	
 	/** Event handler that gets called automatically when the 
