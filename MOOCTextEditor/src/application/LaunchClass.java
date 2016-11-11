@@ -14,6 +14,7 @@ public class LaunchClass {
 	public document.Document getDocument(String text) {
 		// Change this to BasicDocument(text) for week 1 only
 		return new document.EfficientDocument(text);
+		//return new document.BasicDocument(text);
 	}
 	
 	public textgen.MarkovTextGenerator getMTG() {

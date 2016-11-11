@@ -164,12 +164,15 @@ public abstract class Document {
 	}
 	
 	/** return the Flesch readability score of this document */
-	public double getFleschScore()
-	{
-	    // TODO: Implement this method in week 1
-	    return 0.0;
+	public double getFleschScore() {
+		// TODO: Implement this method in week 1
+		int numWords = getNumWords();
+		int numSentences = getNumSentences();
+		int numSyllables = getNumSyllables();
+
+		double fleschScore = (206.835 - (1.015 * ((double)numWords / (double)numSentences)) - (84.6 * ((double)numSyllables / (double)numWords)));
+		return fleschScore;
 	}
-	
 	
 	
 }
