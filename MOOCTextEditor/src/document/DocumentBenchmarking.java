@@ -17,7 +17,7 @@ public class DocumentBenchmarking {
 
 	    // Run each test more than once to get bigger numbers and less noise.
 	    // You can try playing around with this number.
-	    int trials = 100;
+	    int trials = 200;
 
 	    // The text to test on
 	    String textfile = "data/warAndPeace.txt";
@@ -37,6 +37,7 @@ public class DocumentBenchmarking {
 		// TODO: Fill in the rest of this method so that it runs two loops
 		// and prints out timing results as described in the assignment 
 		// instructions and following the pseudocode below.
+		System.out.println("NumberOfChars" + "\t" + "BasicTime" + "\t" + "EfficientTime");
 		for (int numToCheck = start; numToCheck < numSteps*increment + start; 
 				numToCheck += increment)
 		{
@@ -59,6 +60,41 @@ public class DocumentBenchmarking {
 			 *      (on the same line as the first print statement) followed by a newline (\n) 
 			 */  
 			 
+			// String getStringFromFile(String filename, int numChars)
+			/*
+			 * 
+			 * 
+			 * NumberOfChars BasicTime EfficientTime 
+				5000 [basic time 1] [efficient time 1] 
+				10000 [basic time 2] [efficient time 2]
+				15000 [basic time 3] [efficient time 3]
+			 */
+			
+		
+			String stringFromFile = getStringFromFile(textfile,numToCheck);
+			long durationBasicDocSec = 0,durationEfficientDocSec = 0,startTime = 0,endTime = 0;
+			double fScore;
+			
+			
+			for (int i = 0; i < trials ; i++)
+			{
+				//Basic
+			 startTime = System.nanoTime();
+			Document d = new BasicDocument(stringFromFile);	
+			 fScore = d.getFleschScore();
+			 endTime = System.nanoTime();			
+			durationBasicDocSec += ( endTime - startTime);
+			
+			// Efficient
+			 startTime = System.nanoTime();
+			Document d2 = new EfficientDocument(stringFromFile);	
+			 fScore = d2.getFleschScore();
+			 endTime = System.nanoTime();			
+			 durationEfficientDocSec += ( endTime - startTime);
+			}
+			double dBasic = (double)durationBasicDocSec/1000000000;
+			double dEfficiant = (double)durationEfficientDocSec/1000000000;
+			System.out.println(numToCheck + "\t" + dBasic  + "\t" +dEfficiant);
 		}
 	
 	}
