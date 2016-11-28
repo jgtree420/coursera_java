@@ -17,6 +17,11 @@ public class MyLinkedList<E> extends AbstractList<E> {
 	/** Create a new empty LinkedList */
 	public MyLinkedList() {
 		// TODO: Implement this method
+		size = 0;
+		head = new LLNode<E>(null);
+		tail = new LLNode<E>(null);
+		head.next = tail;
+		tail.next = head;
 	}
 
 	/**
@@ -26,7 +31,15 @@ public class MyLinkedList<E> extends AbstractList<E> {
 	public boolean add(E element ) 
 	{
 		// TODO: Implement this method
-		return false;
+		
+		LLNode<E> n = new LLNode<E>(null);
+		n.next = head.next;
+		n.prev = n.next.prev;
+		n.next.prev = n;
+		n.prev.next= n;
+		size += 1;
+		return true;
+		
 	}
 
 	/** Get the element at position index 
@@ -34,6 +47,10 @@ public class MyLinkedList<E> extends AbstractList<E> {
 	public E get(int index) 
 	{
 		// TODO: Implement this method.
+		if (index >= size || index < 0){
+			throw new IndexOutOfBoundsException();
+		}
+		
 		return null;
 	}
 
@@ -97,4 +114,5 @@ class LLNode<E>
 		this.next = null;
 	}
 
+	
 }
