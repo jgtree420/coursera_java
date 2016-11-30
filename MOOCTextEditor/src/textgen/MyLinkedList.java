@@ -35,8 +35,9 @@ public class MyLinkedList<E> extends AbstractList<E> {
 		LLNode<E> n = new LLNode<E>(null);
 		n.next = head.next;
 		n.prev = n.next.prev;
+		n.data = element;
 		n.next.prev = n;
-		n.prev.next= n;
+		n.prev.next = n;
 		size += 1;
 		return true;
 		
@@ -51,7 +52,16 @@ public class MyLinkedList<E> extends AbstractList<E> {
 			throw new IndexOutOfBoundsException();
 		}
 		
-		return null;
+		System.out.println(head.next.data);
+		LLNode<E> currNode = new LLNode<E>(null);
+		for (int i = 0; i <= index ; i++){
+			if (i == 0){
+			currNode = head.next;
+			}
+			else currNode = currNode.next;
+			
+		}
+		return currNode.data;
 	}
 
 	/**
@@ -112,6 +122,12 @@ class LLNode<E>
 		this.data = e;
 		this.prev = null;
 		this.next = null;
+	}
+	
+	
+	public String toString(){
+		return data.toString();
+		
 	}
 
 	
