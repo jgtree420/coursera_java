@@ -54,13 +54,13 @@ public class MyLinkedListTester {
 	public void testGet()
 	{
 		//test empty list, get should throw an exception
-//		try {
-//			emptyList.get(0);
-//			fail("Check out of bounds");
-//		}
-//		catch (IndexOutOfBoundsException e) {
-//			
-//		}
+		try {
+			emptyList.get(0);
+			fail("Check out of bounds");
+		}
+		catch (IndexOutOfBoundsException e) {
+			
+		}
 		
 		// test short list, first contents, then out of bounds
 		assertEquals("Check first", "A", shortList.get(0));
@@ -124,6 +124,9 @@ public class MyLinkedListTester {
 	public void testAddEnd()
 	{
         // TODO: implement this test
+		shortList.add("Jonathan");
+		assertEquals("Check first", "Jonathan", shortList.get(2));
+		
 		
 	}
 
@@ -133,6 +136,7 @@ public class MyLinkedListTester {
 	public void testSize()
 	{
 		// TODO: implement this test
+		assertEquals("Check Size",10,longerList.size());
 	}
 
 	
@@ -145,6 +149,23 @@ public class MyLinkedListTester {
 	public void testAddAtIndex()
 	{
         // TODO: implement this test
+		
+		longerList.add(3,300);
+		assertEquals("Check 3",(Integer)300, longerList.get(3));
+		assertEquals("Check Size",11,longerList.size());
+		
+		longerList.add(0,99);
+		assertEquals("Check 0",(Integer)99, longerList.get(0));
+		assertEquals("Check Size",12,longerList.size());
+		
+		// try to add to an out of bound index
+		try {
+			longerList.add(99,1000);
+			fail("Check out of bounds");
+		}
+		catch (IndexOutOfBoundsException e) {
+		
+		}
 		
 	}
 	
