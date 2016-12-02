@@ -115,6 +115,15 @@ public class MyLinkedListTester {
 		assertEquals("Remove: check size is correct ", 2, list1.size());
 		
 		// TODO: Add more tests here
+		
+		// TODO: Add index out of
+		//you will want to thrown an IndexOutOfBoundsException if the index provided is out of bounds. 
+		try {
+			longerList.remove(11);
+			fail("Check out of bounds");
+		}
+		catch (IndexOutOfBoundsException e) {
+		}		
 	}
 	
 	/** Test adding an element into the end of the list, specifically
@@ -125,7 +134,7 @@ public class MyLinkedListTester {
 	{
         // TODO: implement this test
 		shortList.add("Jonathan");
-		assertEquals("Check first", "Jonathan", shortList.get(2));
+		assertEquals("Check second", "Jonathan", shortList.get(2));
 		
 		
 	}
@@ -137,6 +146,11 @@ public class MyLinkedListTester {
 	{
 		// TODO: implement this test
 		assertEquals("Check Size",10,longerList.size());
+		
+		// add a test to add one more item and check size
+		
+		// add a test to remove an item and then check the size
+		
 	}
 
 	
@@ -167,6 +181,16 @@ public class MyLinkedListTester {
 		
 		}
 		
+		//  ADD test . Null elements are not allowed in the list so 
+		//  if someone tries to insert one you should throw a NullPointerException.
+		try {
+			longerList.add(99,null);
+			fail("Check NullPointerException");
+		}
+		catch (NullPointerException e) {
+		
+		}
+
 	}
 	
 	/** Test setting an element in the list */
@@ -174,6 +198,31 @@ public class MyLinkedListTester {
 	public void testSet()
 	{
 	    // TODO: implement this test
+		
+		// TODO: Test the old value is returned
+		
+		// TODO: Test replace worked
+		
+		//you will want to thrown an IndexOutOfBoundsException if the index provided is out of bounds. 
+				// In addition, if someone tries to set a node with a null element, you should throw a NullPointerException.
+		// try to add to an out of bound index
+		try {
+			longerList.set(99,1000);
+			fail("Check out of bounds");
+		}
+		catch (IndexOutOfBoundsException e) {
+		
+		}
+		
+		//  ADD test . Null elements are not allowed in the list so 
+		//  if someone tries to insert one you should throw a NullPointerException.
+		try {
+			longerList.set(99,null);
+			fail("Check NullPointerException");
+		}
+		catch (NullPointerException e) {
+		
+		}
 	    
 	}
 	
