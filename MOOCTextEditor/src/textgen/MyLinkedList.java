@@ -70,8 +70,12 @@ public class MyLinkedList<E> extends AbstractList<E> {
 	public void add(int index, E element ) 
 	{
 		// TODO: Implement this method
-		if (index >= size || index < 0){
+		if (index > size || index < 0){
 			throw new IndexOutOfBoundsException();
+		}
+		
+		if (element == null){
+			throw new NullPointerException();
 		}
 				
 		LLNode<E> currNode = new LLNode<E>(null);
@@ -109,7 +113,30 @@ public class MyLinkedList<E> extends AbstractList<E> {
 	public E remove(int index) 
 	{
 		// TODO: Implement this method
-		return null;
+		if (index > size || index < 0){
+			throw new IndexOutOfBoundsException();
+		}
+		
+				
+		LLNode<E> currNode = new LLNode<E>(null);
+		LLNode<E> prevNode = new LLNode<E>(null);
+		for (int i = 0; i <= index ; i++){
+			if (i == 0){
+			currNode = head.next;
+			}
+			else currNode = currNode.next;
+			
+		}
+		
+		prevNode = currNode.prev;
+		
+		prevNode.next = currNode.next;
+		//prevNode.prev = prevNode.next.prev;
+		prevNode.next.prev = prevNode;
+		//prevNode.prev.next= prevNode;
+		size -= 1;
+		
+		return currNode.data;
 	}
 
 	/**
@@ -122,8 +149,39 @@ public class MyLinkedList<E> extends AbstractList<E> {
 	public E set(int index, E element) 
 	{
 		// TODO: Implement this method
-		return null;
+		if (index > size || index < 0){
+			throw new IndexOutOfBoundsException();
+		}
+		
+		if (element == null){
+			throw new NullPointerException();
+		}
+				
+		LLNode<E> currNode = new LLNode<E>(null);
+		for (int i = 0; i <= index ; i++){
+			if (i == 0){
+			currNode = head.next;
+			}
+			else currNode = currNode.next;
+			
+		}
+		
+		E olddata = currNode.data;
+		currNode.data = element;
+		
+		return olddata;
 	}   
+	
+	
+	public void printList (){
+        String result = "";
+        LLNode<E>  current = head;
+        while(current.next != null){
+            current = current.next;
+            result += current.data + ", ";
+        }
+        System.out.println("List: " + result); 
+	}
 }
 
 class LLNode<E> 
@@ -147,25 +205,7 @@ class LLNode<E>
 		this.prev = null;
 		this.next = null;
 	}
-	
-	public LLNode(E e, 
-			LLNode<E> prevNode) 
-	{
-
-//		  public SLLNode(E theData,
-//      SLLNode<E> prevNode) {
-//this(theData);
-//this.next = prevNode.next;
-//prevNode.next = this;
-//}
 		
-		this(e);
-		this.next = prevNode.next;
-		this.prev = prevNode.prev;
-		prevNode.next = this;
-		prevNode.prev = this;
-	}
-	
 
 	
 	public String toString(){
