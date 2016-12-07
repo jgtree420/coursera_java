@@ -29,7 +29,7 @@ public class DictionaryBenchmarking {
 		
 		// The number of words to start with. 
 		// You can play around with this.
-		int start = 50000;
+		int start = 5000;
 		
 		String notInDictionary = "notaword";
 		

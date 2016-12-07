@@ -40,6 +40,7 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 	public boolean addWord(String word)
 	{
 	    //TODO: Implement this method.
+		String lowerCaseWord = word.toLowerCase();
 	    return false;
 	}
 	
