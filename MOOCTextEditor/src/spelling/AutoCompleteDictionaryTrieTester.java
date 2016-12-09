@@ -34,14 +34,23 @@ public class AutoCompleteDictionaryTrieTester {
 		largeDict = new AutoCompleteDictionaryTrie();
 
 		smallDict.addWord("Hello");
+		smallDict.printTree();
 		smallDict.addWord("HElLo");
+		smallDict.printTree();
 		smallDict.addWord("help");
+		smallDict.printTree();
 		smallDict.addWord("he");
+		smallDict.printTree();
 		smallDict.addWord("hem");
+		smallDict.printTree();
 		smallDict.addWord("hot");
+		smallDict.printTree();
 		smallDict.addWord("hey");
+		smallDict.printTree();
 		smallDict.addWord("a");
+		smallDict.printTree();
 		smallDict.addWord("subsequent");
+		smallDict.printTree();
 		
 		DictionaryLoader.loadDictionary(largeDict, dictFile);
 	}

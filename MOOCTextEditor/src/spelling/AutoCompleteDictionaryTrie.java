@@ -15,7 +15,8 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 
     private TrieNode root;
     private int size;
-    
+    private TrieNode childNode = new TrieNode();
+    //private TrieNode nextNode = new TrieNode();
 
     public AutoCompleteDictionaryTrie()
 	{
@@ -41,22 +42,60 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 	{
 	    //TODO: Implement this method.
 		String lowerCaseWord = word.toLowerCase();
-		TrieNode childNode = new TrieNode();
-		TrieNode nextNode = new TrieNode();
+		char[] lowerCaseWordArray = lowerCaseWord.toCharArray();
+
+		boolean endOfWord = false;
 		
-		for (char c : lowerCaseWord.toCharArray()){
-			if (root.getText() == "" ){
-				
-				childNode = root.insert(c);
+		for (int i = 0; i < lowerCaseWordArray.length; i++){
+			
+			TrieNode tempNode = new TrieNode();
+			
+			Character c = lowerCaseWordArray[i];
+			if (i == (lowerCaseWordArray.length - 1)){
+				endOfWord = true;
 			}
-			else {
-				
-				childNode = childNode.insert(c);
-				
+			if (i == 0){
+				childNode = root.getChild(c);
+				if (childNode == null){
+					childNode = root.insert(c);
+					if (endOfWord){
+						childNode.setEndsWord(true);
+						size++;
+					}
+				}
+				else {
+					if (childNode.endsWord() && endOfWord){
+						return false;
+					}
+					if (endOfWord){
+						childNode.setEndsWord(true);
+						size++;
+					}
+				}
+			}
+			else{
+				tempNode = childNode.getChild(c);
+				if (tempNode == null){
+					childNode = childNode.insert(c);
+					if (endOfWord){
+						childNode.setEndsWord(true);
+						size++;
+					}
+				}
+				else {
+					
+					if (tempNode.endsWord() && endOfWord){
+						return false;
+					}
+					childNode = childNode.getChild(c);
+					if (endOfWord){
+						childNode.setEndsWord(true);
+						size++;
+					}
+				}
 			}
 		}
 		
-		printTree();
 	    return true;
 	}
 	
@@ -67,7 +106,7 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 	public int size()
 	{
 	    //TODO: Implement this method
-	    return 0;
+	    return size;
 	}
 	
 	
