@@ -112,12 +112,43 @@ public class AutoCompleteDictionaryTrie implements  Dictionary, AutoComplete {
 	
 	/** Returns whether the string is a word in the trie, using the algorithm
 	 * described in the videos for this week. */
-	@Override
+	@Override	
 	public boolean isWord(String s) 
 	{
 	    // TODO: Implement this method
+		boolean endOfWord = false;
+		String lowerCaseWord = s.toLowerCase();
+		char[] lowerCaseWordArray = lowerCaseWord.toCharArray();
+		
+		if (root == null || root.getValidNextCharacters().isEmpty()){
+			return false;
+			}
+		
+		TrieNode curr = root;
+		TrieNode next = null;
+		//for (Character c : s.toLowerCase().toCharArray() ){
+		for (int i = 0; i < lowerCaseWordArray.length; i++){
+			Character c = lowerCaseWordArray[i];
+			if (i == (lowerCaseWordArray.length - 1)){
+				endOfWord = true;
+			}
+			
+			next = curr.getChild(c);
+			if (next == null){
+				return false;
+			}		
+			else if (next.endsWord() && endOfWord){
+				return true;
+			}
+			else {
+				curr = next;
+			}
+		}
+		
 		return false;
 	}
+	
+	
 
 	/** 
      * Return a list, in order of increasing (non-decreasing) word length,
