@@ -30,10 +30,10 @@ import util.GraphLoader;
  */
 public class MapGraph {
 	// TODO: Add your member variables here in WEEK 3
-	private Map<GeographicPoint, ArrayList<GeographicPoint>> adjListsMap;
+	//private Map<GeographicPoint, ArrayList<GeographicPoint>> adjListsMap;
 	private int numVertices;
 	private int numEdges;
-	//HashMap<GeographicPoint,MapNode> vertices;
+	private Map<GeographicPoint,MapNode> vertices;
 
 
 	/**
@@ -41,7 +41,7 @@ public class MapGraph {
 	 */
 	public MapGraph() {
 		// TODO: Implement in this constructor in WEEK 3
-		adjListsMap = new HashMap<GeographicPoint, ArrayList<GeographicPoint>>();
+		vertices = new HashMap<GeographicPoint, MapNode>();
 		numVertices = 0;
 		numEdges = 0;
 	}
@@ -79,31 +79,7 @@ public class MapGraph {
 		return numEdges;
 	}
 
-	/**
-	 * Add a node corresponding to an intersection at a Geographic Point If the
-	 * location is already in the graph or null, this method does not change the
-	 * graph.
-	 * 
-	 * @param location
-	 *            The location of the intersection
-	 * @return true if a node was added, false if it was not (the node was
-	 *         already in the graph, or the parameter is null).
-	 */
-	public boolean addVertex(GeographicPoint location) {
-		// TODO: Implement this method in WEEK 3
-		// int v = getNumVertices();
-		ArrayList<GeographicPoint> neighbors = new ArrayList<GeographicPoint>();
-		// if location is not null and does not already exist in the adjListMap
-		// add and then return true
-		if (location != null && !adjListsMap.containsKey(location)) {
-			adjListsMap.put(location, neighbors);
-			numVertices++;
-			return true;
-		}
 
-		// TODO: Add logic for True False
-		return false;
-	}
 
 	/**
 	 * Adds a directed edge to the graph from pt1 to pt2. Precondition: Both
