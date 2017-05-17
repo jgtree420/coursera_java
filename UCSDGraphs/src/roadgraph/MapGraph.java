@@ -30,7 +30,7 @@ import util.GraphLoader;
  */
 public class MapGraph {
 	// TODO: Add your member variables here in WEEK 3
-	//private Map<GeographicPoint, ArrayList<GeographicPoint>> adjListsMap;
+	//private Map<GeographicPoint, ArrayList<GeographicPoint>> vertices;
 	private int numVertices;
 	private int numEdges;
 	private Map<GeographicPoint,MapNode> vertices;
@@ -80,7 +80,34 @@ public class MapGraph {
 	}
 
 
+	/**
+	 * Add a node corresponding to an intersection at a Geographic Point If the
+	 * location is already in the graph or null, this method does not change the
+	 * graph.
+	 * 
+	 * @param location
+	 *            The location of the intersection
+	 * @return true if a node was added, false if it was not (the node was
+	 *         already in the graph, or the parameter is null).
+	 */
+	public boolean addVertex(GeographicPoint location) {
+		// TODO: Implement this method in WEEK 3
+		// int v = getNumVertices();
+		//ArrayList<GeographicPoint> neighbors = new ArrayList<GeographicPoint>();
+		// if location is not null and does not already exist in the adjListMap
+		// add and then return true
+		MapNode mNode = new MapNode();
+		
+		if (location != null && !vertices.containsKey(location)) {
+			//vertices.put(location, neighbors);
+			vertices.put(location, mNode);
+			numVertices++;
+			return true;
+		}
 
+		// TODO: Add logic for True False
+		return false;
+	}
 	/**
 	 * Adds a directed edge to the graph from pt1 to pt2. Precondition: Both
 	 * GeographicPoints have already been added to the graph
@@ -110,12 +137,13 @@ public class MapGraph {
 
 			throw new IllegalArgumentException();
 		}
+		MapNode mTo = new MapNode();
 		// If the points have not already been added as nodes to the graph
-		if (adjListsMap.get(from).contains(to)) {
+		if (vertices.get(from).equals(mTo)) {
 			throw new IllegalArgumentException();
 		}
 		numEdges++;
-		(adjListsMap.get(from)).add(to);
+		(vertices.get(from)).setGeographicPoint(to);
 
 	}
 
@@ -215,7 +243,7 @@ public class MapGraph {
 	}
 
 	public List<GeographicPoint> getNeighbors(GeographicPoint v) {
-		return new ArrayList<GeographicPoint>(adjListsMap.get(v));
+		return new ArrayList<GeographicPoint>(vertices.get(v));
 	}
 
 	/**
@@ -321,9 +349,9 @@ public class MapGraph {
 		String s = "Adjacency list";
 		s += " (size " + getNumVertices() + "+" + getNumEdges() + " integers):";
 
-		for (GeographicPoint v : adjListsMap.keySet()) {
+		for (GeographicPoint v : vertices.keySet()) {
 			s += "\n\t" + v + ": ";
-			for (GeographicPoint w : adjListsMap.get(v)) {
+			for (GeographicPoint w : vertices.get(v)) {
 				s += w + ", ";
 			}
 		}

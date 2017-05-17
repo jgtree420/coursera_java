@@ -7,7 +7,5 @@ public class MapEdge {
 	GeographicPoint end;
 	String streetName;
 	double distance;
-	String streetType;
-	
-	
+	String streetType;	
 }
