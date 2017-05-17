@@ -29,12 +29,10 @@ import util.GraphLoader;
  *
  */
 public class MapGraph {
-	// TODO: Add your member variables here in WEEK 3
-	//private Map<GeographicPoint, ArrayList<GeographicPoint>> vertices;
+
 	private int numVertices;
 	private int numEdges;
-	private Map<GeographicPoint,MapNode> vertices;
-
+	private Map<GeographicPoint, MapNode> vertices;
 
 	/**
 	 * Create a new empty MapGraph
@@ -64,9 +62,7 @@ public class MapGraph {
 	public Set<GeographicPoint> getVertices() {
 		// TODO: Implement this method in WEEK 3
 
-		// return HashSet
-		HashSet hs = new HashSet();
-		return hs;
+		return vertices.keySet();
 	}
 
 	/**
@@ -78,7 +74,6 @@ public class MapGraph {
 		// TODO: Implement this method in WEEK 3
 		return numEdges;
 	}
-
 
 	/**
 	 * Add a node corresponding to an intersection at a Geographic Point If the
@@ -92,22 +87,20 @@ public class MapGraph {
 	 */
 	public boolean addVertex(GeographicPoint location) {
 		// TODO: Implement this method in WEEK 3
-		// int v = getNumVertices();
-		//ArrayList<GeographicPoint> neighbors = new ArrayList<GeographicPoint>();
+
 		// if location is not null and does not already exist in the adjListMap
 		// add and then return true
 		MapNode mNode = new MapNode();
-		
+
 		if (location != null && !vertices.containsKey(location)) {
-			//vertices.put(location, neighbors);
 			vertices.put(location, mNode);
 			numVertices++;
 			return true;
 		}
 
-		// TODO: Add logic for True False
 		return false;
 	}
+
 	/**
 	 * Adds a directed edge to the graph from pt1 to pt2. Precondition: Both
 	 * GeographicPoints have already been added to the graph
@@ -137,13 +130,19 @@ public class MapGraph {
 
 			throw new IllegalArgumentException();
 		}
-		MapNode mTo = new MapNode();
+
+		// add data to the MapEdge Object
+		MapEdge edge = new MapEdge(from, to, roadName, roadType, length);
+
 		// If the points have not already been added as nodes to the graph
-		if (vertices.get(from).equals(mTo)) {
+		if (vertices.get(from).getNeighbors().contains(edge)) {
 			throw new IllegalArgumentException();
 		}
+
+		// Add the edge to the vertices neighbor list
+		(vertices.get(from)).addNeighbor(edge);
+		// increment the numEdges
 		numEdges++;
-		(vertices.get(from)).setGeographicPoint(to);
 
 	}
 
@@ -182,17 +181,16 @@ public class MapGraph {
 		// TODO: Implement this method in WEEK 3
 
 		// Hook for visualization. See writeup.
-		// nodeSearched.accept(next.getLocation());
-		// initial variables
+			//	nodeSearched.accept(next.getLocation());
 
+		// check if start or goal is null. If true return empty list
 		if (start == null || goal == null) {
 			System.out.println("Start or goal node is null!  No path exists.");
 			return new LinkedList<GeographicPoint>();
 		}
-		// MapNode node = new MapNode(start, goal, null, null);
 
 		HashMap<GeographicPoint, GeographicPoint> parentMap = new HashMap<GeographicPoint, GeographicPoint>();
-		boolean found = bfsSearch(start, goal, parentMap);
+		boolean found = bfsSearch(start, goal, parentMap, nodeSearched);
 
 		if (!found) {
 			System.out.println("No path exists");
@@ -203,47 +201,114 @@ public class MapGraph {
 	}
 
 	private boolean bfsSearch(GeographicPoint start, GeographicPoint goal,
-			HashMap<GeographicPoint, GeographicPoint> parentMap) {
+			HashMap<GeographicPoint, GeographicPoint> parentMap, Consumer<GeographicPoint> nodeSearched) {
+		// store visited points in a hashset
 		HashSet<GeographicPoint> visited = new HashSet<GeographicPoint>();
+		// use a Queue for breadth first search
 		Queue<GeographicPoint> toExplore = new LinkedList<GeographicPoint>();
+
+		// queue start location
 		toExplore.add(start);
+
+		// use boolean found to store if we found goal or not
 		boolean found = false;
+
+		// explore while queue is not empty
 		while (!toExplore.isEmpty()) {
+
+			// set point curr to head of queue
 			GeographicPoint curr = toExplore.remove();
+
+			// check if curr equal goal
 			if (curr.equals(goal)) {
 				found = true;
 				break;
 			}
-			// List<GeographicPoint> neighbors = curr.getNeighbors();
+
+			// get Neighbors of curr
 			List<GeographicPoint> neighbors = getNeighbors(curr);
+
+			// use a list iterator to traverse backward
 			ListIterator<GeographicPoint> it = neighbors.listIterator(neighbors.size());
 			while (it.hasPrevious()) {
 				GeographicPoint next = it.previous();
+
+				// if the next point is not part of our visited set
+				// then add next to visited
+				// and also add point next to parent hash map. this allows us to
+				// easily find parent point curr
+				// finally add point next to the Queue (toExplore)
 				if (!visited.contains(next)) {
 					visited.add(next);
 					parentMap.put(next, curr);
 					toExplore.add(next);
+					nodeSearched.accept(next);
 				}
 			}
 		}
 
+		// return true if we found goal else return false
 		return found;
 	}
 
+	/**
+	 * Construct the Path from start to goal
+	 * 
+	 * @param start
+	 *            The starting location
+	 * @param goal
+	 *            The ending location
+	 * @param parentMap
+	 *            the HashMap that stores the a point mapped to its parent point
+	 * @return A list of points representing the path from start to ending goal
+	 */
 	private List<GeographicPoint> reconstructPath(GeographicPoint start, GeographicPoint goal,
 			HashMap<GeographicPoint, GeographicPoint> parentMap) {
+
+		// Use a linked list to store the path
 		LinkedList<GeographicPoint> path = new LinkedList<GeographicPoint>();
+
+		// initialze the curr point as the goal
 		GeographicPoint curr = goal;
+
+		// Working from the ending point curr
+		// add to the linked list's front if we have not reached the starting
+		// point
+		// set next point curr equal to the parent of the current curr point
 		while (curr != start) {
 			path.addFirst(curr);
 			curr = parentMap.get(curr);
 		}
+
+		// finally add the starting point to the head of the linked list
 		path.addFirst(start);
+
+		// return an ordered linked list
 		return path;
 	}
 
+	/**
+	 * Get Neighbors of point v
+	 * 
+	 * @param v
+	 *            The location we want neighbors of
+	 * @return A list of point v's neighbors
+	 */
 	public List<GeographicPoint> getNeighbors(GeographicPoint v) {
-		return new ArrayList<GeographicPoint>(vertices.get(v));
+		// Store MapNode associated to point v in tempNode
+		MapNode tempNode = vertices.get(v);
+		
+		// store list of map edges in neighborEdgeList
+		List<MapEdge> neighborEdgeList = tempNode.getNeighbors();
+		
+		// Add point end from each edge to neighbors list
+		List<GeographicPoint> neighborList = new ArrayList<GeographicPoint>();
+		for (MapEdge i : neighborEdgeList) {
+			neighborList.add(i.getEnd());
+		}
+
+		return neighborList;
+
 	}
 
 	/**
@@ -336,7 +401,7 @@ public class MapGraph {
 	public String toString() {
 		String s = "\nGraph with " + numVertices + " vertices and " + numEdges + " edges.\n";
 		if (numVertices <= 20)
-			s += adjacencyString();
+			s += printMap();
 		return s;
 	}
 
@@ -345,13 +410,14 @@ public class MapGraph {
 	 * 
 	 * @return the String
 	 */
-	public String adjacencyString() {
+	public String printMap() {
 		String s = "Adjacency list";
 		s += " (size " + getNumVertices() + "+" + getNumEdges() + " integers):";
 
 		for (GeographicPoint v : vertices.keySet()) {
 			s += "\n\t" + v + ": ";
-			for (GeographicPoint w : vertices.get(v)) {
+			MapNode m = vertices.get(v);
+			for (MapEdge w : m.getNeighbors()) {
 				s += w + ", ";
 			}
 		}
