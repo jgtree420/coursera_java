@@ -401,8 +401,84 @@ public class MapGraph {
 		// Hook for visualization. See writeup.
 		// nodeSearched.accept(next.getLocation());
 
-		return null;
+		// Setup - check validity of inputs
+		if (start == null || goal == null)
+			throw new NullPointerException("Cannot find route from or to null node");
+		MapNode startNode = pointNodeMap.get(start);
+		MapNode endNode = pointNodeMap.get(goal);
+		if (startNode == null) {
+			System.err.println("Start node " + start + " does not exist");
+			return null;
+		}
+		if (endNode == null) {
+			System.err.println("End node " + goal + " does not exist");
+			return null;
+		}
+
+		// setup to begin dijkstra
+		HashMap<MapNode, MapNode> parentMap = new HashMap<MapNode, MapNode>();
+		Queue<MapNode> toExplore = new PriorityQueue<MapNode>();
+		HashSet<MapNode> visited = new HashSet<MapNode>();
+		startNode.setDistanceFromStart(0.0);
+		toExplore.add(startNode);
+		MapNode next = null;
+
+		while (!toExplore.isEmpty()) {
+			next = toExplore.remove();
+
+			// hook for visualization
+			nodeSearched.accept(next.getLocation());
+			if (!visited.contains(next)) {
+				visited.add(next);
+				
+				// if we found goal break
+				if (next.equals(endNode))
+					break;
+				
+				Set<MapNode> neighbors = getNeighbors(next);
+				for (MapNode neighbor : neighbors) {
+					if (!visited.contains(neighbor)) {
+						for (MapEdge e : next.getEdges()){
+							
+							//find the Edge that routes to the Neighbor Node
+							if (e.getOtherNode(next).equals(neighbor)){
+								
+								
+								//distance(GeographicPoint other)
+								Double tempStraightLineDist = next.getLocation().distance(goal) ;
+								// calculate distance from the start
+								Double tempDist = next.getDistanceFromStart() + e.getLength() + tempStraightLineDist;
+								
+								// Update Neighbor's distance if shorter
+								//  update parent map with new mapping
+								if (neighbor.getDistanceFromStart() > tempDist) {
+									neighbor.setDistanceFromStart(tempDist);
+									parentMap.put(neighbor, next);
+
+								}
+							}
+						}
+
+
+						//enQueue into the Prioty Queue
+						toExplore.add(neighbor);
+
+					}
+				}
+			}
+
+		}
+
+		if (!next.equals(endNode)) {
+			System.out.println("No path found from " + start + " to " + goal);
+			return null;
+		}
+		// Reconstruct the parent path
+		List<GeographicPoint> path = reconstructPath(parentMap, startNode, endNode);
+
+		return path;
 	}
+
 
 	/* (non-Javadoc)
 	 * @see java.lang.Object#toString()
@@ -422,7 +498,7 @@ public class MapGraph {
 
 		GeographicPoint start = new GeographicPoint(1.0, 1.0);
 		GeographicPoint end = new GeographicPoint(8.0, -1.0);
-		List<GeographicPoint> route = theMap.dijkstra(start, end);
+		List<GeographicPoint> route = theMap.aStarSearch(start, end);
 		System.out.println(route);
 		//System.out.println(theMap);
 
