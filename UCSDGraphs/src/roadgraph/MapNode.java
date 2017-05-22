@@ -14,14 +14,31 @@ import geography.GeographicPoint;
  * Class representing a vertex (or node) in our MapGraph
  *
  */
-class MapNode
+class MapNode implements Comparable
 {
 	/** The list of edges out of this node */
 	private HashSet<MapEdge> edges;
 		
 	/** the latitude and longitude of this node */
 	private GeographicPoint location;
+	
+	/** distance from start */
+	private Double distanceFromStart;
 		
+	/**
+	 * @return the distanceFromStart
+	 */
+	public Double getDistanceFromStart() {
+		return distanceFromStart;
+	}
+
+	/**
+	 * @param distanceFromStart the distanceFromStart to set
+	 */
+	public void setDistanceFromStart(Double distanceFromStart) {
+		this.distanceFromStart = distanceFromStart;
+	}
+
 	/** 
 	 * Create a new MapNode at a given Geographic location
 	 * @param loc the location of this node
@@ -30,6 +47,8 @@ class MapNode
 	{
 		location = loc;
 		edges = new HashSet<MapEdge>();
+		/** initialize distance as positive infinity */
+		distanceFromStart = Double.POSITIVE_INFINITY;
 	}
 		
 	/**
@@ -106,11 +125,12 @@ class MapNode
 	public String toString()
 	{
 		String toReturn = "[NODE at location (" + location + ")";
+		toReturn += " distance from Start: " + distanceFromStart.toString();
 		toReturn += " intersects streets: ";
 		for (MapEdge e: edges) {
 			toReturn += e.getRoadName() + ", ";
 		}
-		toReturn += "]";
+		toReturn += "]\n";
 		return toReturn;
 	}
 
@@ -124,5 +144,26 @@ class MapNode
 		toReturn += ")";
 		return toReturn;
 	}
+
+	/** compareTo used for sorting MapNodes.
+	 *  @return 0,-1, 1 depending on distance from the start point
+	 */
+	@Override
+	public int compareTo(Object o) {
+
+
+		if (this.getDistanceFromStart() < ((MapNode)o).getDistanceFromStart()){
+			return -1;
+		}
+		if (this.getDistanceFromStart() > ((MapNode)o).getDistanceFromStart()){
+			return 1;
+		}	
+		
+		// else they are equal
+		return 0;
+	}
+
+	
+
 
 }
