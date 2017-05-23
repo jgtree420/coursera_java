@@ -24,7 +24,28 @@ class MapNode implements Comparable
 	
 	/** distance from start */
 	private Double distanceFromStart;
+	
+	/** A* Cost from start */
+	private Double aStarCost;
+	
+	/** Dijkstra Cost */
+	public static final Double dijkstraEstimatedDistance = 0.0;
+	
 		
+	/**
+	 * @return the aStarCost
+	 */
+	public Double getaStarCost() {
+		return aStarCost;
+	}
+
+	/**
+	 * @param aStarCost the aStarCost to set
+	 */
+	public void setaStarCost(Double distanceFromStart, Double estimatedDistance) {
+		this.aStarCost = distanceFromStart + estimatedDistance;
+	}
+
 	/**
 	 * @return the distanceFromStart
 	 */
@@ -49,6 +70,7 @@ class MapNode implements Comparable
 		edges = new HashSet<MapEdge>();
 		/** initialize distance as positive infinity */
 		distanceFromStart = Double.POSITIVE_INFINITY;
+		aStarCost = Double.POSITIVE_INFINITY;
 	}
 		
 	/**
@@ -125,12 +147,14 @@ class MapNode implements Comparable
 	public String toString()
 	{
 		String toReturn = "[NODE at location (" + location + ")";
-		toReturn += " distance from Start: " + distanceFromStart.toString();
+		
 		toReturn += " intersects streets: ";
 		for (MapEdge e: edges) {
 			toReturn += e.getRoadName() + ", ";
 		}
 		toReturn += "]\n";
+		toReturn += " distance from Start: " + distanceFromStart.toString();
+		toReturn += " a* Cost: " + this.getaStarCost();
 		return toReturn;
 	}
 
@@ -152,10 +176,10 @@ class MapNode implements Comparable
 	public int compareTo(Object o) {
 
 
-		if (this.getDistanceFromStart() < ((MapNode)o).getDistanceFromStart()){
+		if (this.getaStarCost() < ((MapNode)o).getaStarCost()){
 			return -1;
 		}
-		if (this.getDistanceFromStart() > ((MapNode)o).getDistanceFromStart()){
+		if (this.getaStarCost() > ((MapNode)o).getaStarCost()){
 			return 1;
 		}	
 		
