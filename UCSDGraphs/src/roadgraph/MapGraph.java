@@ -568,6 +568,7 @@ public class MapGraph {
 		  //81 Dijkstra
 		  
 		  List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
+		  // 19 a*
 	
 
 	}
