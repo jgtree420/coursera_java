@@ -119,6 +119,20 @@ class MapEdge
 	}
 
 	/**
+	 * @return the roadType
+	 */
+	public String getRoadType() {
+		return roadType;
+	}
+
+	/**
+	 * @param roadType the roadType to set
+	 */
+	public void setRoadType(String roadType) {
+		this.roadType = roadType;
+	}
+
+	/**
 	 * Given one of the nodes involved in this edge, get the other one
 	 * @param node The node on one side of this edge
 	 * @return the other node involved in this edge

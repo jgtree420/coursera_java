@@ -25,6 +25,9 @@ class MapNode implements Comparable
 	/** distance from start */
 	private Double distanceFromStart;
 	
+	/** duration from start */
+	private Double durationFromStart;
+	
 	/** A* Cost from start */
 	private Double aStarCost;
 	
@@ -113,6 +116,20 @@ class MapNode implements Comparable
 		return edges;
 	}
 	
+	/**
+	 * @return the durationFromStart
+	 */
+	public Double getDurationFromStart() {
+		return durationFromStart;
+	}
+
+	/**
+	 * @param durationFromStart the durationFromStart to set
+	 */
+	public void setDurationFromStart(Double durationFromStart) {
+		this.durationFromStart = durationFromStart;
+	}
+
 	/** Returns whether two nodes are equal.
 	 * Nodes are considered equal if their locations are the same, 
 	 * even if their street list is different.

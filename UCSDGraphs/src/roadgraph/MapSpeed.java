@@ -60,7 +60,7 @@ public class MapSpeed {
 	 * @return the getSpeedLimitTraffic
 	 */
 	public Double getSpeedLimitTraffic() {
-		return getSpeedLimit() * getTrafficPenalty();
+		return getSpeedLimit() / getTrafficPenalty();
 	}
 	
 	

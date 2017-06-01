@@ -7,6 +7,7 @@
  */
 package roadgraph;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -34,6 +35,7 @@ public class MapGraph {
 	// that contain those nodes.
 	private HashMap<GeographicPoint, MapNode> pointNodeMap;
 	private HashSet<MapEdge> edges;
+	private HashMap<String,MapSpeed> speedMap;
 
 	/**
 	 * Create a new empty MapGraph
@@ -41,6 +43,7 @@ public class MapGraph {
 	public MapGraph() {
 		pointNodeMap = new HashMap<GeographicPoint, MapNode>();
 		edges = new HashSet<MapEdge>();
+		speedMap = new HashMap<String,MapSpeed>();
 	}
 
 	/**
@@ -130,7 +133,31 @@ public class MapGraph {
 		n1.addEdge(edge);
 
 	}
+	
+	/***
+	 * addMapSpeed
+	 */
+	
+	public void addMapSpeed (String roadType, MapSpeed mapSpeed){
+		speedMap.put(roadType, mapSpeed);
+	}
 
+	/***
+	 * getMapSpeed
+	 */
+	
+	public MapSpeed getMapSpeed (String roadType){
+		return speedMap.get(roadType);
+	}
+	
+	
+	/***
+	 * getAllMapSpeed
+	 */
+	
+	public Collection<MapSpeed> getAllMapSpeed (){
+		return speedMap.values();
+	}
 	/**
 	 * Get a set of neighbor nodes from a mapNode
 	 * 
@@ -468,6 +495,19 @@ public class MapGraph {
 								// calculate distance from the start
 								Double tempDist = next.getDistanceFromStart() + e.getLength();
 								Double tempEstimatedDistance = neighbor.getLocation().distance(goal);
+								
+								// calculate duration from start and estimated duration
+								String tempRoadType = e.getRoadType();
+								MapSpeed tempMapSpeed = getMapSpeed(tempRoadType);
+								Double tempSpeed = tempMapSpeed.getSpeedLimit();
+								
+								Double tempDistDuration = next.getDurationFromStart() + (e.getLength() * tempSpeed);
+								
+								//  For the algorithm to find the actual shortest path, 
+								// the heuristic function must be admissible, meaning that it never overestimates 
+								// the actual cost to get to the nearest goal node.
+								Double tempEstimatedDistanceDuration = 0.0;
+								
 								Double tempAStarCost = tempDist + tempEstimatedDistance;
 
 								// Update Neighbor's distance if shorter
@@ -509,7 +549,7 @@ public class MapGraph {
 	@Override
 	public String toString() {
 		return "MapGraph [getNumVertices()=" + getNumVertices() + ", getVertices()=" + getVertices()
-				+ ", getNumEdges()=" + getNumEdges() + "]";
+				+ ", getNumEdges()=" + getNumEdges() + ", getAllMapSpeeds() = " + getAllMapSpeed() +"]";
 	}
 
 	public static void main(String[] args) {
@@ -545,14 +585,13 @@ public class MapGraph {
 		 */
 
 		MapGraph simpleTestMap = new MapGraph();
-		// GraphLoader.loadRoadMap("data/testdata/simpletest.map",
-		// simpleTestMap);
+		GraphLoader.loadRoadMap("data/testdata/simpletest.map",
+		 simpleTestMap);
 		//
 		GeographicPoint testStart = new GeographicPoint(1.0, 1.0);
 		GeographicPoint testEnd = new GeographicPoint(8.0, -1.0);
 
-		// System.out.println("Test 1 using simpletest: Dijkstra should be 9 and
-		// AStar should be 5");
+		 System.out.println("Test 1 using simpletest: Dijkstra should be 9 and AStar should be 5");
 		List<GeographicPoint> testroute = simpleTestMap.dijkstra(testStart, testEnd);
 		List<GeographicPoint> testroute2 = simpleTestMap.aStarSearch(testStart, testEnd);
 
