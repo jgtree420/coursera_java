@@ -21,6 +21,7 @@ import java.util.function.Consumer;
 
 import geography.GeographicPoint;
 import util.GraphLoader;
+import util.SpeedLimitLoader;
 
 /**
  * @author UCSD MOOC development team and YOU
@@ -36,6 +37,22 @@ public class MapGraph {
 	private HashMap<GeographicPoint, MapNode> pointNodeMap;
 	private HashSet<MapEdge> edges;
 	private HashMap<String,MapSpeed> speedMap;
+	private SearchCost searchCost = SearchCost.DISTANCE;
+
+
+	/**
+	 * @return the searchCost
+	 */
+	public SearchCost getSearchCost() {
+		return searchCost;
+	}
+
+	/**
+	 * @param searchCost the searchCost to set
+	 */
+	public void setSearchCost(SearchCost searchCost) {
+		this.searchCost = searchCost;
+	}
 
 	/**
 	 * Create a new empty MapGraph
@@ -177,7 +194,8 @@ public class MapGraph {
 
 		pointNodeMap.forEach((k, v) -> {
 			v.setDistanceFromStart(Double.POSITIVE_INFINITY);
-			v.setaStarCost(Double.POSITIVE_INFINITY, MapNode.dijkstraEstimatedDistance);
+			v.setDurationFromStart(Double.POSITIVE_INFINITY);
+			v.setaStarCost(Double.POSITIVE_INFINITY, MapNode.dijkstraEstimatedDistance);			
 		});
 
 
@@ -388,7 +406,7 @@ public class MapGraph {
 									neighbor.setDistanceFromStart(tempDist);
 									neighbor.setaStarCost(tempDist, MapNode.dijkstraEstimatedDistance);
 									parentMap.put(neighbor, next);
-									// enQueue into the Prioty Queue
+									// enQueue into the Priority Queue
 									toExplore.add(neighbor);
 
 								}
@@ -466,6 +484,7 @@ public class MapGraph {
 		Queue<MapNode> toExplore = new PriorityQueue<MapNode>();
 		HashSet<MapNode> visited = new HashSet<MapNode>();
 		startNode.setDistanceFromStart(0.0);
+		startNode.setDurationFromStart(0.0);
 		toExplore.add(startNode);
 		MapNode next = null;
 		int nodesVisited = 0;
@@ -499,24 +518,37 @@ public class MapGraph {
 								// calculate duration from start and estimated duration
 								String tempRoadType = e.getRoadType();
 								MapSpeed tempMapSpeed = getMapSpeed(tempRoadType);
-								Double tempSpeed = tempMapSpeed.getSpeedLimit();
+								// initialize at min speed of 20KMH
+								Double tempSpeed = 20.0; 
+								Double tempSpeedTraffic = 20.0; 
+								if (tempMapSpeed != null){
+									tempSpeed = tempMapSpeed.getSpeedLimit();
+									tempSpeedTraffic = tempMapSpeed.getSpeedLimitTraffic();
+								}
+							
+								if (searchCost == SearchCost.DURATION_TRAFFIC) {
+									tempSpeed = tempSpeedTraffic;
+								}
 								
 								Double tempDistDuration = next.getDurationFromStart() + (e.getLength() * tempSpeed);
 								
 								//  For the algorithm to find the actual shortest path, 
 								// the heuristic function must be admissible, meaning that it never overestimates 
 								// the actual cost to get to the nearest goal node.
-								Double tempEstimatedDistanceDuration = 0.0;
+								// therefore if i take the tempEstimatedDistance and multiply it by a constant Max Legal Speed, this
+								//   should always under estimate 
+								Double tempEstimatedDistanceDuration = tempEstimatedDistance * MapNode.MAXKILOPERHOUR;
 								
-								Double tempAStarCost = tempDist + tempEstimatedDistance;
+								Double tempAStarCost = tempDistDuration + tempEstimatedDistanceDuration;
 
 								// Update Neighbor's distance if shorter
 								// update parent map with new mapping
 								if (neighbor.getaStarCost() > tempAStarCost) {
 									neighbor.setDistanceFromStart(tempDist);
-									neighbor.setaStarCost(tempDist, tempEstimatedDistance);
+									neighbor.setDurationFromStart(tempDistDuration);
+									neighbor.setaStarCost(tempDistDuration, tempEstimatedDistanceDuration);
 									parentMap.put(neighbor, next);
-									// enQueue into the Prioty Queue
+									// enQueue into the Priority Queue
 									toExplore.add(neighbor);
 
 								}
@@ -587,7 +619,11 @@ public class MapGraph {
 		MapGraph simpleTestMap = new MapGraph();
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map",
 		 simpleTestMap);
+		SpeedLimitLoader.loadSpeedLimitFile("data/speedlimits/defaults.txt", simpleTestMap);
 		//
+		// set searchCost
+		//simpleTestMap.setSearchCost(SearchCost.DURATION_TRAFFIC);
+		
 		GeographicPoint testStart = new GeographicPoint(1.0, 1.0);
 		GeographicPoint testEnd = new GeographicPoint(8.0, -1.0);
 
@@ -597,6 +633,7 @@ public class MapGraph {
 
 		MapGraph testMap = new MapGraph();
 		GraphLoader.loadRoadMap("data/maps/utc.map", testMap);
+		SpeedLimitLoader.loadSpeedLimitFile("data/speedlimits/defaults.txt", testMap);
 
 		// A very simple test using real data testStart = new
 		testStart = new GeographicPoint(32.869423, -117.220917);

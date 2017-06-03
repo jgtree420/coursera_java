@@ -32,12 +32,12 @@ public class SpeedLimitLoader {
 		// TODO Auto-generated method stub
 		String speedLimitFile = "data/speedlimits/defaults.txt";
 		roadgraph.MapGraph map = new roadgraph.MapGraph();
-		SpeedLimitLoadFile(speedLimitFile, map);
+		loadSpeedLimitFile(speedLimitFile, map);
 
 	}
 
 	// Read File using lines() and Stream approach.
-	private static void SpeedLimitLoadFile(String speedLimitFile, roadgraph.MapGraph map) {
+	public static void loadSpeedLimitFile(String speedLimitFile, roadgraph.MapGraph map) {
 		Stream<String> speedLimitStream = null;
 		List<MapSpeed> mapSpeeds = new ArrayList<MapSpeed>();
 

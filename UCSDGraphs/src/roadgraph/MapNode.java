@@ -33,7 +33,9 @@ class MapNode implements Comparable
 	
 	/** Dijkstra Cost */
 	public static final Double dijkstraEstimatedDistance = 0.0;
-	
+
+	/** Max Kilometer per hour */
+	public static final Double MAXKILOPERHOUR = 130.0;
 		
 	/**
 	 * @return the aStarCost
@@ -42,11 +44,13 @@ class MapNode implements Comparable
 		return aStarCost;
 	}
 
-	/**
-	 * @param aStarCost the aStarCost to set
+	/** 
+	 * setaStarCost - set A* cost
+	 * @param costFromStart cost from the start, for example, distance from start
+	 * @param estimatedCost estimate cost to goal, for example distance to goal as a bird would fly
 	 */
-	public void setaStarCost(Double distanceFromStart, Double estimatedDistance) {
-		this.aStarCost = distanceFromStart + estimatedDistance;
+	public void setaStarCost(Double costFromStart, Double estimatedCost) {
+		this.aStarCost = costFromStart + estimatedCost;
 	}
 
 	/**
@@ -167,10 +171,11 @@ class MapNode implements Comparable
 		
 		toReturn += " intersects streets: ";
 		for (MapEdge e: edges) {
-			toReturn += e.getRoadName() + ", ";
+			toReturn += e.getRoadName() + "(" + e.getRoadType()  + "), ";
 		}
 		toReturn += "]\n";
 		toReturn += " distance from Start: " + distanceFromStart.toString();
+		toReturn += " duration from Start: " + this.getDurationFromStart();
 		toReturn += " a* Cost: " + this.getaStarCost();
 		return toReturn;
 	}

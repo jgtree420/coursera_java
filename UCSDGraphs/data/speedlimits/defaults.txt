@@ -11,3 +11,4 @@ tertiary	40	1.2
 tertiary_link	32	1.4
 trunk	32	1.5
 unclassified	40	1.6
+city street	40	1.2
