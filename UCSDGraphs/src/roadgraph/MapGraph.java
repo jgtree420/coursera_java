@@ -366,6 +366,7 @@ public class MapGraph {
 		}
 
 		// setup to begin dijkstra
+		resetMapNodeCosts();
 		HashMap<MapNode, MapNode> parentMap = new HashMap<MapNode, MapNode>();
 		Queue<MapNode> toExplore = new PriorityQueue<MapNode>();
 		HashSet<MapNode> visited = new HashSet<MapNode>();
@@ -432,7 +433,7 @@ public class MapGraph {
 		// Reconstruct the parent path
 		List<GeographicPoint> path = reconstructPath(parentMap, startNode, endNode);
 
-		System.out.println("Nodes visited in search:" + nodesVisited);
+		System.out.println("Nodes visited in dijkstra search:" + nodesVisited);
 
 		return path;
 
@@ -553,7 +554,7 @@ public class MapGraph {
 		// Reconstruct the parent path
 		List<GeographicPoint> path = reconstructPath(parentMap, startNode, endNode);
 
-		System.out.println("Nodes visited in search:" + nodesVisited);
+		System.out.println("Nodes visited in a* search:" + nodesVisited);
 
 		return path;
 	}
@@ -625,9 +626,11 @@ public class MapGraph {
 
 		MapGraph simpleTestMap = new MapGraph();
 		GraphLoader.loadRoadMap("data/testdata/simpletest.map", simpleTestMap);
-		SpeedLimitLoader.loadSpeedLimitFile("data/speedlimits/defaults.txt", simpleTestMap);
+		SpeedLimitLoader.loadSpeedLimitFile("data/speedlimits/favorNonRes.txt", simpleTestMap);
 		//
 		// set searchCost
+		 //simpleTestMap.setSearchCost(SearchCost.DISTANCE);
+		// simpleTestMap.setSearchCost(SearchCost.DURATION);
 		 simpleTestMap.setSearchCost(SearchCost.DURATION_TRAFFIC);
 
 		GeographicPoint testStart = new GeographicPoint(1.0, 1.0);
