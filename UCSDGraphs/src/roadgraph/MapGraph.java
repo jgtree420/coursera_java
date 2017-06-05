@@ -36,9 +36,8 @@ public class MapGraph {
 	// that contain those nodes.
 	private HashMap<GeographicPoint, MapNode> pointNodeMap;
 	private HashSet<MapEdge> edges;
-	private HashMap<String,MapSpeed> speedMap;
+	private HashMap<String, MapSpeed> speedMap;
 	private SearchCost searchCost = SearchCost.DISTANCE;
-
 
 	/**
 	 * @return the searchCost
@@ -48,7 +47,8 @@ public class MapGraph {
 	}
 
 	/**
-	 * @param searchCost the searchCost to set
+	 * @param searchCost
+	 *            the searchCost to set
 	 */
 	public void setSearchCost(SearchCost searchCost) {
 		this.searchCost = searchCost;
@@ -60,7 +60,7 @@ public class MapGraph {
 	public MapGraph() {
 		pointNodeMap = new HashMap<GeographicPoint, MapNode>();
 		edges = new HashSet<MapEdge>();
-		speedMap = new HashMap<String,MapSpeed>();
+		speedMap = new HashMap<String, MapSpeed>();
 	}
 
 	/**
@@ -150,31 +150,31 @@ public class MapGraph {
 		n1.addEdge(edge);
 
 	}
-	
+
 	/***
 	 * addMapSpeed
 	 */
-	
-	public void addMapSpeed (String roadType, MapSpeed mapSpeed){
+
+	public void addMapSpeed(String roadType, MapSpeed mapSpeed) {
 		speedMap.put(roadType, mapSpeed);
 	}
 
 	/***
 	 * getMapSpeed
 	 */
-	
-	public MapSpeed getMapSpeed (String roadType){
+
+	public MapSpeed getMapSpeed(String roadType) {
 		return speedMap.get(roadType);
 	}
-	
-	
+
 	/***
 	 * getAllMapSpeed
 	 */
-	
-	public Collection<MapSpeed> getAllMapSpeed (){
+
+	public Collection<MapSpeed> getAllMapSpeed() {
 		return speedMap.values();
 	}
+
 	/**
 	 * Get a set of neighbor nodes from a mapNode
 	 * 
@@ -187,17 +187,16 @@ public class MapGraph {
 		return node.getNeighbors();
 	}
 
-	/**resetMapNodeCosts
-	 * 	reset each Map Nodes Distance From Start and A* Cost
+	/**
+	 * resetMapNodeCosts reset each Map Nodes Distance From Start and A* Cost
 	 */
 	private void resetMapNodeCosts() {
 
 		pointNodeMap.forEach((k, v) -> {
 			v.setDistanceFromStart(Double.POSITIVE_INFINITY);
 			v.setDurationFromStart(Double.POSITIVE_INFINITY);
-			v.setaStarCost(Double.POSITIVE_INFINITY, MapNode.dijkstraEstimatedDistance);			
+			v.setaStarCost(Double.POSITIVE_INFINITY);
 		});
-
 
 	}
 
@@ -254,9 +253,9 @@ public class MapGraph {
 		}
 
 		// setup to begin BFS
-		
+
 		resetMapNodeCosts();
-		
+
 		HashMap<MapNode, MapNode> parentMap = new HashMap<MapNode, MapNode>();
 		Queue<MapNode> toExplore = new LinkedList<MapNode>();
 		HashSet<MapNode> visited = new HashSet<MapNode>();
@@ -404,7 +403,7 @@ public class MapGraph {
 								// update parent map with new mapping
 								if (neighbor.getDistanceFromStart() > tempDist) {
 									neighbor.setDistanceFromStart(tempDist);
-									neighbor.setaStarCost(tempDist, MapNode.dijkstraEstimatedDistance);
+									neighbor.setaStarCost(tempDist);
 									parentMap.put(neighbor, next);
 									// enQueue into the Priority Queue
 									toExplore.add(neighbor);
@@ -514,39 +513,18 @@ public class MapGraph {
 								// calculate distance from the start
 								Double tempDist = next.getDistanceFromStart() + e.getLength();
 								Double tempEstimatedDistance = neighbor.getLocation().distance(goal);
-								
-								// calculate duration from start and estimated duration
-								String tempRoadType = e.getRoadType();
-								MapSpeed tempMapSpeed = getMapSpeed(tempRoadType);
-								// initialize at min speed of 20KMH
-								Double tempSpeed = 20.0; 
-								Double tempSpeedTraffic = 20.0; 
-								if (tempMapSpeed != null){
-									tempSpeed = tempMapSpeed.getSpeedLimit();
-									tempSpeedTraffic = tempMapSpeed.getSpeedLimitTraffic();
-								}
-							
-								if (searchCost == SearchCost.DURATION_TRAFFIC) {
-									tempSpeed = tempSpeedTraffic;
-								}
-								
-								Double tempDistDuration = next.getDurationFromStart() + (e.getLength() * tempSpeed);
-								
-								//  For the algorithm to find the actual shortest path, 
-								// the heuristic function must be admissible, meaning that it never overestimates 
-								// the actual cost to get to the nearest goal node.
-								// therefore if i take the tempEstimatedDistance and multiply it by a constant Max Legal Speed, this
-								//   should always under estimate 
-								Double tempEstimatedDistanceDuration = tempEstimatedDistance * MapNode.MAXKILOPERHOUR;
-								
-								Double tempAStarCost = tempDistDuration + tempEstimatedDistanceDuration;
 
-								// Update Neighbor's distance if shorter
+								// calculate a * cost
+								MapNode tempMapNode = calculateCost(tempDist, next.getDurationFromStart(),
+										tempEstimatedDistance, e);
+
+								// Update Neighbor's costs if calculated cost is
+								// shorter
 								// update parent map with new mapping
-								if (neighbor.getaStarCost() > tempAStarCost) {
-									neighbor.setDistanceFromStart(tempDist);
-									neighbor.setDurationFromStart(tempDistDuration);
-									neighbor.setaStarCost(tempDistDuration, tempEstimatedDistanceDuration);
+								if (neighbor.getaStarCost() > tempMapNode.getaStarCost()) {
+									neighbor.setDistanceFromStart(tempMapNode.getDistanceFromStart());
+									neighbor.setDurationFromStart(tempMapNode.getDurationFromStart());
+									neighbor.setaStarCost(tempMapNode.getaStarCost());
 									parentMap.put(neighbor, next);
 									// enQueue into the Priority Queue
 									toExplore.add(neighbor);
@@ -573,6 +551,60 @@ public class MapGraph {
 		return path;
 	}
 
+	private MapNode calculateCost(Double distanceFromStart, Double durationFromStart, Double estimatedDistance,
+			MapEdge edge) {
+
+		Double tempAStarCost = 0.0;
+		MapNode tempMapNode = new MapNode(null);
+		
+
+		if (searchCost == SearchCost.DISTANCE) {
+			// compute cost using distance
+			tempAStarCost = distanceFromStart + estimatedDistance;
+		} else {
+			// initialize at min speed of 20KMH
+			Double tempSpeed = 20.0;
+			Double tempSpeedTraffic = 20.0;
+			MapSpeed tempMapSpeed;
+
+
+			tempMapSpeed = getMapSpeed(edge.getRoadType());
+			if (tempMapSpeed != null) {
+				tempSpeed = tempMapSpeed.getSpeedLimit();
+				tempSpeedTraffic = tempMapSpeed.getSpeedLimitTraffic();
+			}
+
+			if (searchCost == SearchCost.DURATION_TRAFFIC) {
+				tempSpeed = tempSpeedTraffic;
+			}
+
+			
+			// compute cost using durtion
+
+			Double tempDistDuration = durationFromStart + (edge.getLength() * tempSpeed);
+
+			// For the algorithm to find the actual shortest path,
+			// the heuristic function must be admissible, meaning that it never
+			// overestimates
+			// the actual cost to get to the nearest goal node.
+			// therefore if i take the tempEstimatedDistance and multiply it by
+			// a
+			// constant Max Legal Speed, this
+			// should always under estimate
+			Double tempEstimatedDistanceDuration = estimatedDistance * MapNode.MAXKILOPERHOUR;
+
+			tempAStarCost = tempDistDuration + tempEstimatedDistanceDuration;
+			tempMapNode.setDurationFromStart(tempDistDuration);
+
+		}
+
+		tempMapNode.setDistanceFromStart(distanceFromStart);
+
+		tempMapNode.setaStarCost(tempAStarCost);
+
+		return tempMapNode;
+	}
+
 	/*
 	 * (non-Javadoc)
 	 * 
@@ -580,54 +612,25 @@ public class MapGraph {
 	 */
 	@Override
 	public String toString() {
-		return "MapGraph [getNumVertices()=" + getNumVertices() + ", getVertices()=" + getVertices()
-				+ ", getNumEdges()=" + getNumEdges() + ", getAllMapSpeeds() = " + getAllMapSpeed() +"]";
+		return "MapGraph [getSearchCost()=" + getSearchCost() + ", getNumVertices()=" + getNumVertices()
+				+ ", getVertices()=" + getVertices() + ", getNumEdges()=" + getNumEdges() + ", getAllMapSpeeds() = "
+				+ getAllMapSpeed() + "]";
 	}
 
 	public static void main(String[] args) {
-		/*
-		 * System.out.print("Making a new map..."); MapGraph theMap = new
-		 * MapGraph(); System.out.print("DONE. \nLoading the map...");
-		 * GraphLoader.loadRoadMap("data/testdata/simpletest.map", theMap);
-		 * System.out.println("DONE.");
-		 * 
-		 * GeographicPoint start = new GeographicPoint(1.0, 1.0);
-		 * GeographicPoint end = new GeographicPoint(8.0, -1.0);
-		 * List<GeographicPoint> route = theMap.aStarSearch(start, end);
-		 * System.out.println(route);
-		 */
-		// System.out.println(theMap);
-
-		// You can use this method for testing.
-
-		/*
-		 * Use this code in Week 3 End of Week Quiz MapGraph theMap = new
-		 * MapGraph(); System.out.print("DONE. \nLoading the map...");
-		 * GraphLoader.loadRoadMap("data/maps/utc.map", theMap);
-		 * System.out.println("DONE.");
-		 * 
-		 * GeographicPoint start = new GeographicPoint(32.8648772,
-		 * -117.2254046); GeographicPoint end = new GeographicPoint(32.8660691,
-		 * -117.217393);
-		 * 
-		 * 
-		 * List<GeographicPoint> route = theMap.dijkstra(start,end);
-		 * List<GeographicPoint> route2 = theMap.aStarSearch(start,end);
-		 * 
-		 */
 
 		MapGraph simpleTestMap = new MapGraph();
-		GraphLoader.loadRoadMap("data/testdata/simpletest.map",
-		 simpleTestMap);
+		GraphLoader.loadRoadMap("data/testdata/simpletest.map", simpleTestMap);
 		SpeedLimitLoader.loadSpeedLimitFile("data/speedlimits/defaults.txt", simpleTestMap);
 		//
 		// set searchCost
 		//simpleTestMap.setSearchCost(SearchCost.DURATION_TRAFFIC);
-		
+
 		GeographicPoint testStart = new GeographicPoint(1.0, 1.0);
 		GeographicPoint testEnd = new GeographicPoint(8.0, -1.0);
 
-		 System.out.println("Test 1 using simpletest: Dijkstra should be 9 and AStar should be 5");
+		System.out.println("Test 1 using simpletest: Dijkstra should be 9 and AStar should be 5");
+		System.out.println(simpleTestMap);
 		List<GeographicPoint> testroute = simpleTestMap.dijkstra(testStart, testEnd);
 		List<GeographicPoint> testroute2 = simpleTestMap.aStarSearch(testStart, testEnd);
 
@@ -646,8 +649,8 @@ public class MapGraph {
 		testStart = new GeographicPoint(32.8674388, -117.2190213);
 		testEnd = new GeographicPoint(32.8697828, -117.2244506);
 		System.out.println("Test 3 using utc: Dijkstra should be 37 and AStar should be 10");
-		 testroute = testMap.dijkstra(testStart,testEnd);
-		 testroute2 = testMap.aStarSearch(testStart,testEnd);
+		testroute = testMap.dijkstra(testStart, testEnd);
+		testroute2 = testMap.aStarSearch(testStart, testEnd);
 
 		MapGraph theMap = new MapGraph();
 		System.out.print("DONE. \nLoading the map...");
@@ -657,10 +660,10 @@ public class MapGraph {
 		GeographicPoint start = new GeographicPoint(32.8648772, -117.2254046);
 		GeographicPoint end = new GeographicPoint(32.8660691, -117.217393);
 
-		//List<GeographicPoint> route = theMap.dijkstra(start, end);
+		// List<GeographicPoint> route = theMap.dijkstra(start, end);
 		// 81 Dijkstra
 
-		//List<GeographicPoint> route2 = theMap.aStarSearch(start, end);
+		// List<GeographicPoint> route2 = theMap.aStarSearch(start, end);
 		// 19 a*
 
 	}

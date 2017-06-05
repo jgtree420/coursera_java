@@ -44,15 +44,24 @@ class MapNode implements Comparable
 		return aStarCost;
 	}
 
+//	/** 
+//	 * setaStarCost - set A* cost
+//	 * @param costFromStart cost from the start, for example, distance from start
+//	 * @param estimatedCost estimate cost to goal, for example distance to goal as a bird would fly
+//	 */
+//	public void setaStarCost(Double costFromStart, Double estimatedCost) {
+//		this.aStarCost = costFromStart + estimatedCost;
+//	}
+
 	/** 
 	 * setaStarCost - set A* cost
-	 * @param costFromStart cost from the start, for example, distance from start
-	 * @param estimatedCost estimate cost to goal, for example distance to goal as a bird would fly
+	 * @param aStarCost a calculated a* cost
 	 */
-	public void setaStarCost(Double costFromStart, Double estimatedCost) {
-		this.aStarCost = costFromStart + estimatedCost;
+	public void setaStarCost(Double aStarCost) {
+		this.aStarCost = aStarCost;
 	}
 
+	
 	/**
 	 * @return the distanceFromStart
 	 */
