@@ -370,6 +370,7 @@ public class MapGraph {
 		Queue<MapNode> toExplore = new PriorityQueue<MapNode>();
 		HashSet<MapNode> visited = new HashSet<MapNode>();
 		startNode.setDistanceFromStart(0.0);
+		startNode.setDurationFromStart(0.0);
 		toExplore.add(startNode);
 		MapNode next = null;
 		int nodesVisited = 0;
@@ -398,16 +399,22 @@ public class MapGraph {
 
 								// calculate distance from the start
 								Double tempDist = next.getDistanceFromStart() + e.getLength();
+								Double tempEstimatedDistance = MapNode.dijkstraEstimatedDistance;
 
-								// Update Neighbor's distance if shorter
+								// calculate a * cost
+								MapNode tempMapNode = calculateCost(tempDist, next.getDurationFromStart(),
+										tempEstimatedDistance, e);
+
+								// Update Neighbor's costs if calculated cost is
+								// shorter
 								// update parent map with new mapping
-								if (neighbor.getDistanceFromStart() > tempDist) {
-									neighbor.setDistanceFromStart(tempDist);
-									neighbor.setaStarCost(tempDist);
+								if (neighbor.getaStarCost() > tempMapNode.getaStarCost()) {
+									neighbor.setDistanceFromStart(tempMapNode.getDistanceFromStart());
+									neighbor.setDurationFromStart(tempMapNode.getDurationFromStart());
+									neighbor.setaStarCost(tempMapNode.getaStarCost());
 									parentMap.put(neighbor, next);
 									// enQueue into the Priority Queue
 									toExplore.add(neighbor);
-
 								}
 							}
 						}
@@ -556,7 +563,6 @@ public class MapGraph {
 
 		Double tempAStarCost = 0.0;
 		MapNode tempMapNode = new MapNode(null);
-		
 
 		if (searchCost == SearchCost.DISTANCE) {
 			// compute cost using distance
@@ -566,7 +572,6 @@ public class MapGraph {
 			Double tempSpeed = 20.0;
 			Double tempSpeedTraffic = 20.0;
 			MapSpeed tempMapSpeed;
-
 
 			tempMapSpeed = getMapSpeed(edge.getRoadType());
 			if (tempMapSpeed != null) {
@@ -578,8 +583,7 @@ public class MapGraph {
 				tempSpeed = tempSpeedTraffic;
 			}
 
-			
-			// compute cost using durtion
+			// compute cost using duration
 
 			Double tempDistDuration = durationFromStart + (edge.getLength() * tempSpeed);
 
@@ -624,7 +628,7 @@ public class MapGraph {
 		SpeedLimitLoader.loadSpeedLimitFile("data/speedlimits/defaults.txt", simpleTestMap);
 		//
 		// set searchCost
-		//simpleTestMap.setSearchCost(SearchCost.DURATION_TRAFFIC);
+		 simpleTestMap.setSearchCost(SearchCost.DURATION_TRAFFIC);
 
 		GeographicPoint testStart = new GeographicPoint(1.0, 1.0);
 		GeographicPoint testEnd = new GeographicPoint(8.0, -1.0);
@@ -642,8 +646,8 @@ public class MapGraph {
 		testStart = new GeographicPoint(32.869423, -117.220917);
 		testEnd = new GeographicPoint(32.869255, -117.216927);
 		System.out.println("Test 2 using utc: Dijkstra should be 13 and AStar should be 5");
-		// testroute = testMap.dijkstra(testStart,testEnd);
-		// testroute2 = testMap.aStarSearch(testStart,testEnd);
+		 testroute = testMap.dijkstra(testStart,testEnd);
+		 testroute2 = testMap.aStarSearch(testStart,testEnd);
 
 		// A slightly more complex test using real data
 		testStart = new GeographicPoint(32.8674388, -117.2190213);
